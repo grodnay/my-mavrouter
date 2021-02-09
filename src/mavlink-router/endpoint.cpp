@@ -288,7 +288,8 @@ void Endpoint::_add_sys_comp_id(uint16_t sys_comp_id)
 {
     if (has_sys_comp_id(sys_comp_id))
         return;
-
+    if ((sys_comp_id >> 8)  == MAGIC_SYS_ID)
+        log_info("Magic sys_id [%u] identified. [%d] is now sniffing all messages",MAGIC_SYS_ID,fd);
     _sys_comp_ids.push_back(sys_comp_id);
 }
 
@@ -347,6 +348,11 @@ bool Endpoint::accept_msg(int target_sysid, int target_compid, uint8_t src_sysid
     // This endpoint has the target of message (sysid, but compid is broadcast or non-existent): accept
     if ((target_compid == 0 || target_compid == -1) && has_sys_id(target_sysid))
         return true;
+
+    // This endpoint has the magic_sys_id: accept
+    if ((MAGIC_SYS_ID!=0)&&has_sys_id(MAGIC_SYS_ID)) 
+        return true;
+    
 
     // Reject everything else
     return false;

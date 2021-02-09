@@ -17,6 +17,11 @@
  */
 #pragma once
 
+//An endpoint with this system id becomes a "sniffer" and all
+//messages are accepted. 
+#define MAGIC_SYS_ID 254
+
+
 #include <common/mavlink.h>
 
 #include <memory>
