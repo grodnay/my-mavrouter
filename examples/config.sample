@@ -52,7 +52,11 @@
 #       level is being used by mavlink-router, with <debug> being the
 #       most verbose.
 #       Default:<info>
-#
+#   SnifferSysid
+#       Sysid of sniffer. All traffic is forwarded to endpoints with this sys id.
+#       Useful for debug porposes with a mavlink inspector on this endpont.
+#       Default: 0 (disabled)
+# 
 # Section [UartEndpoint]: This section must have a name
 #
 # Keys:
@@ -117,15 +121,16 @@
 TcpServerPort=5790
 ReportStats=false
 MavlinkDialect=auto
+SnifferSysid=254
 
 [UdpEndpoint alfa]
 Mode = Eavesdropping
 Address = 0.0.0.0
 Port = 10000
 
-[UartEndpoint bravo]
-Device = /dev/tty0
-Baud = 52000
+#[UartEndpoint bravo]
+#Device = /dev/tty0
+#Baud = 52000
 
 [UdpEndpoint charlie]
 Mode = Normal

@@ -53,6 +53,7 @@ static struct options opt = {
     .mavlink_dialect = Auto,
     .min_free_space = 0,
     .max_log_files = 0,
+    .sniffer_sysid = 0,
 };
 
 static const struct option long_options[] = {{"endpoints", required_argument, NULL, 'e'},
@@ -478,8 +479,7 @@ static int parse_argv(int argc, char *argv[])
                 help(stderr);
                 return -EINVAL;
             }
-            log_info("An endpoint with sysid %u on it will sniff all messages", id);
-            Endpoint::sniffer_sysid = id;
+            opt.sniffer_sysid = id;
             break;
         }
         case 'p': {
@@ -712,6 +712,8 @@ static int parse_confs(ConfFile &conf)
          OPTIONS_TABLE_STRUCT_FIELD(options, min_free_space)},
         {"MaxLogFiles", false, ConfFile::parse_ul,
          OPTIONS_TABLE_STRUCT_FIELD(options, max_log_files)},
+        {"SnifferSysid", false, ConfFile::parse_ul,
+         OPTIONS_TABLE_STRUCT_FIELD(options, sniffer_sysid)},
     };
 
     struct option_uart {
@@ -919,6 +921,10 @@ int main(int argc, char *argv[])
         goto close_log;
 
     Log::set_max_level((Log::Level)opt.debug_log_level);
+
+    Endpoint::sniffer_sysid = opt.sniffer_sysid;
+    if (Endpoint::sniffer_sysid != 0)
+        log_info("An endpoint with sysid %u on it will sniff all messages", Endpoint::sniffer_sysid);
 
     dbg("Cmd line and options parsed");
 
