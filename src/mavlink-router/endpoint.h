@@ -17,11 +17,6 @@
  */
 #pragma once
 
-//An endpoint with this system id becomes a "sniffer" and all
-//messages are accepted. 
-#define MAGIC_SYS_ID 254
-
-
 #include <common/mavlink.h>
 
 #include <memory>
@@ -72,6 +67,10 @@ struct _packed_ mavlink_router_mavlink1_header {
 
 class Endpoint : public Pollable {
 public:
+    // An endpoint with this system id becomes a "sniffer" and all
+    // messages are accepted.
+    static uint16_t sniffer_sysid;
+
     /*
      * Success returns for @read_msg()
      */
@@ -96,12 +95,14 @@ public:
 
     bool has_sys_id(unsigned sysid);
     bool has_sys_comp_id(unsigned sys_comp_id);
-    bool has_sys_comp_id(unsigned sysid, unsigned compid) {
+    bool has_sys_comp_id(unsigned sysid, unsigned compid)
+    {
         uint16_t sys_comp_id = ((sysid & 0xff) << 8) | (compid & 0xff);
         return has_sys_comp_id(sys_comp_id);
     }
 
-    bool accept_msg(int target_sysid, int target_compid, uint8_t src_sysid, uint8_t src_compid, uint32_t msg_id);
+    bool accept_msg(int target_sysid, int target_compid, uint8_t src_sysid, uint8_t src_compid,
+                    uint32_t msg_id);
 
     void add_message_to_filter(uint32_t msg_id) { _message_filter.push_back(msg_id); }
 
@@ -152,7 +153,7 @@ private:
 class UartEndpoint : public Endpoint {
 public:
     UartEndpoint()
-        : Endpoint {"UART"}
+        : Endpoint{"UART"}
     {
     }
     virtual ~UartEndpoint();
@@ -216,13 +217,9 @@ public:
 #endif
     int retry_timeout = 0;
 
-    inline const char *get_ip() {
-        return _ip;
-    }
+    inline const char *get_ip() { return _ip; }
 
-    inline unsigned long get_port() {
-        return _port;
-    }
+    inline unsigned long get_port() { return _port; }
 
     bool is_valid() override { return _valid; };
 

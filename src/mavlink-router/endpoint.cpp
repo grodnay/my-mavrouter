@@ -47,6 +47,8 @@
 
 #define UART_BAUD_RETRY_SEC 5
 
+uint16_t  Endpoint::sniffer_sysid=0;
+
 Endpoint::Endpoint(const char *name)
     : _name{name}
 {
@@ -288,8 +290,8 @@ void Endpoint::_add_sys_comp_id(uint16_t sys_comp_id)
 {
     if (has_sys_comp_id(sys_comp_id))
         return;
-    if ((sys_comp_id >> 8)  == MAGIC_SYS_ID)
-        log_info("Magic sys_id [%u] identified. [%d] is now sniffing all messages",MAGIC_SYS_ID,fd);
+    if ( (sniffer_sysid!=0) && ((sys_comp_id >> 8)  == sniffer_sysid) )
+        log_info("Sniffer sysid %u identified. [%d] is now sniffing all messages",sniffer_sysid,fd);
     _sys_comp_ids.push_back(sys_comp_id);
 }
 
@@ -349,8 +351,8 @@ bool Endpoint::accept_msg(int target_sysid, int target_compid, uint8_t src_sysid
     if ((target_compid == 0 || target_compid == -1) && has_sys_id(target_sysid))
         return true;
 
-    // This endpoint has the magic_sys_id: accept
-    if ((MAGIC_SYS_ID!=0)&&has_sys_id(MAGIC_SYS_ID)) 
+    // This endpoint has the sniffer_sysid: accept
+    if ((sniffer_sysid!=0)&&has_sys_id(sniffer_sysid)) 
         return true;
     
 
